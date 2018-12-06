@@ -17,7 +17,7 @@ public class WallBlock {
         this.right = right;
         this.bottom = bottom;
         this.block = new Paint();
-        if(x) this.block.setColor(Color.BLUE);
+        //if(x) this.block.setColor(Color.BLUE);
         if(!x) this.block.setColor(Color.YELLOW);
         this.block.setStyle(Paint.Style.FILL);
         this.block.setAntiAlias(false);
