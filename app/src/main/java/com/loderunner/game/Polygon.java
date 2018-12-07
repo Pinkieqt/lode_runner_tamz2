@@ -32,12 +32,12 @@ public class Polygon {
         {
             for(int j = 0; j < 3; j++)
             {
-                if(i == 3)
-                    polygon[i][j] = new WallBlock(x,y, x+50, y+50, false);
+                //if(i == 3)
+                 //   polygon[i][j] = new WallBlock(x,y, x+50, y+50, false);
 
-                polygon[i][j] = new WallBlock(x , y, x+50, y+50, true);
-                polygon[i][j].drawBlock(canvas);
-                y += 50;
+                //polygon[i][j] = new WallBlock(x , y, x+50, y+50, true);
+                //polygon[i][j].drawBlock(canvas);
+                //y += 50;
 
             }
             x = 0;
