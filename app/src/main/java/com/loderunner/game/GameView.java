@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -40,6 +41,21 @@ public class GameView extends View {
     //Touch check - moving bool
     private boolean isTouched = false;
     private String direction;
+
+
+    //Level
+    private int level[] = {
+            1,1,0,0,0,0,0,0,0,1,
+            1,0,0,1,1,0,0,1,1,1,
+            1,0,0,0,0,0,0,0,0,1,
+            1,0,0,1,1,1,1,1,1,1,
+            1,0,0,0,0,1,0,1,0,1,
+            1,1,0,0,0,0,0,0,0,1,
+            1,1,1,1,1,1,0,0,1,1,
+            1,0,0,0,0,0,0,0,0,1,
+            1,0,0,0,0,0,0,0,0,1,
+            1,1,1,1,1,1,1,1,1,1
+    };
 
 
 
@@ -84,7 +100,15 @@ public class GameView extends View {
 
         //Draw map
         pol = new Polygon(canvasWidth, canvasHeight);
-        pol.drawMap(canvas);
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                if(level[i*10 + j] == 1)
+                    canvas.drawBitmap(Bitmap.createScaledBitmap(bgBlock, (int)pol.cellSize, (int)pol.cellSize, true), pol.posX, pol.posY, null);
+                pol.posX += pol.cellSize;
+            }
+            pol.posX = 0;
+            pol.posY += pol.cellSize;
+        }
 
         //Draw infotaintment
         canvas.drawText("Coins: 0", 20, 60, coinsText);
@@ -96,9 +120,16 @@ public class GameView extends View {
         character.drawCharacter(canvas);
         character.moveCharacter(isTouched, direction);
 
+        //Draw map
+
 
     }
 
+
+
+
+
+    //On touch
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         int x = (int) event.getX();
@@ -128,7 +159,8 @@ public class GameView extends View {
                 }
                 break;
             case MotionEvent.ACTION_MOVE:
-                //Log.i("TAG", "moving: (" + x + ", " + y + ")");
+                x = (int) event.getX();
+                y = (int) event.getY();
                 break;
             case MotionEvent.ACTION_UP:
                 isTouched = false;

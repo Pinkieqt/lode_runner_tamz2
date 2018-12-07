@@ -1,29 +1,38 @@
 package com.loderunner.game;
 
+import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 
 public class Polygon {
+    public int posX = 0;
+    public int posY;
     private int width;
     private int height;
-    private int polygonHorizontal = 20;
-    private int polygonVertical = 35;
-    private WallBlock[][] polygon = new WallBlock[polygonHorizontal][polygonVertical];
+    private int cellCount = 10;
+    private String[][] polygon = new String[cellCount][cellCount];
 
-    private double paintWidth;
-    private double paintHeight;
-    private double paintX;
-    private double paintY;
+    public float cellSize;
+    private float paintX;
+    private float paintY;
 
 
 
     public Polygon(int cvwidth, int cvheight) {
+        //Velikost screenu
         this.width = cvwidth;
-        this.height = cvheight;
+        this.height = cvwidth;
 
-        this.paintWidth = cvwidth / this.polygonHorizontal;
-        this.paintHeight = cvheight / this.polygonVertical;
+        this.posY = cvheight / 25;
+
+        this.cellSize = this.width / this.cellCount;
     }
+
+    public void drawBitmap(Context context, Bitmap image, int posX, int poY){
+
+    }
+
 
     public void drawMap(Canvas canvas){
         int x = 0;
