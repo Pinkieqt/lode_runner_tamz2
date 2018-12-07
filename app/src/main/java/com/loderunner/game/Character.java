@@ -22,6 +22,7 @@ public class Character {
     public void moveCharacter(boolean isTouched, String direction){
         if(isTouched){
             if(direction == "left"){
+                //github prostě nefunguje?
                 this.posX -= charSpeed;
             }
             if(direction == "bottom"){
