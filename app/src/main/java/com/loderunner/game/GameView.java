@@ -1,5 +1,6 @@
 package com.loderunner.game;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,7 +13,12 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import java.util.ArrayList;
+
 public class GameView extends View {
+
+    //Helping
+    int pocitadlo;
 
     //Canvas
     private int canvasWidth;
@@ -25,10 +31,13 @@ public class GameView extends View {
     private Bitmap bottomBtn;
 
     //Character
-    private Character character = new Character(70, 80);
+    private Bitmap characterImg[] = new Bitmap[3];
+    private Character character = new Character(400, 400, characterImg);
 
     //Map
     private Polygon pol;
+    private ArrayList<WallBlock> wallBlocks = new ArrayList<>();
+    private boolean isCharacterDrawed = false;
 
     //Background images
     private Bitmap bgImage;
@@ -45,16 +54,16 @@ public class GameView extends View {
 
     //Level
     private int level[] = {
-            1,1,0,0,0,0,0,0,0,1,
-            1,0,0,1,1,0,0,1,1,1,
-            1,0,0,0,0,0,0,0,0,1,
-            1,0,0,1,1,1,1,1,1,1,
-            1,0,0,0,0,1,0,1,0,1,
-            1,1,0,0,0,0,0,0,0,1,
-            1,1,1,1,1,1,0,0,1,1,
-            1,0,0,0,0,0,0,0,0,1,
-            1,0,0,0,0,0,0,0,0,1,
-            1,1,1,1,1,1,1,1,1,1
+            0,1,0,0,0,0,0,0,0,0,
+            0,0,0,1,1,0,0,1,1,0,
+            0,0,0,0,0,0,0,0,0,0,
+            0,0,0,1,1,1,1,1,1,0,
+            0,0,0,0,0,1,0,1,0,0,
+            0,1,0,0,0,0,0,0,0,0,
+            0,1,1,1,1,1,0,0,1,0,
+            0,0,0,0,0,0,0,0,0,0,
+            0,0,0,0,2,0,0,0,0,0,
+            0,1,1,1,1,1,1,1,1,0
     };
 
 
@@ -68,6 +77,9 @@ public class GameView extends View {
         bottomBtn = BitmapFactory.decodeResource(getResources(), R.drawable.bottom_arrow);
         leftBtn = BitmapFactory.decodeResource(getResources(), R.drawable.left_arrow);
         rightBtn = BitmapFactory.decodeResource(getResources(), R.drawable.right_arrow);
+        characterImg[0] = BitmapFactory.decodeResource(getResources(), R.drawable.char_left);
+        characterImg[1] = BitmapFactory.decodeResource(getResources(), R.drawable.char_right);
+        characterImg[2] = BitmapFactory.decodeResource(getResources(), R.drawable.char_climb);
 
         //score
         coinsText.setColor(Color.WHITE);
@@ -81,9 +93,9 @@ public class GameView extends View {
         levelText.setTypeface(Typeface.DEFAULT_BOLD);
         levelText.setTextAlign(Paint.Align.CENTER);
         levelText.setAntiAlias(true);
-
     }
 
+    @SuppressLint("DrawAllocation")
     @Override
     protected void onDraw(Canvas canvas) {
         canvasWidth = canvas.getWidth();
@@ -102,9 +114,25 @@ public class GameView extends View {
         pol = new Polygon(canvasWidth, canvasHeight);
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
-                if(level[i*10 + j] == 1)
-                    canvas.drawBitmap(Bitmap.createScaledBitmap(bgBlock, (int)pol.cellSize, (int)pol.cellSize, true), pol.posX, pol.posY, null);
-                pol.posX += pol.cellSize;
+                switch(level[i*10 + j]){
+                    case 0:
+                        pol.posX += pol.cellSize;
+                        break;
+                    case 1:
+                        //Hitboxy od zdí
+                        wallBlocks.add(new WallBlock(pol.posX, pol.posY, pol.cellSize, canvas));
+                        canvas.drawBitmap(Bitmap.createScaledBitmap(bgBlock, (int)pol.cellSize, (int)pol.cellSize, true), pol.posX, pol.posY, null);
+                        pol.posX += pol.cellSize;
+                        break;
+                    case 2:
+                        if(!isCharacterDrawed){
+                            character = new Character(pol.posX, pol.posY, characterImg);
+                            isCharacterDrawed = true;
+                        }
+                        character.drawCharacter(canvas, pol.cellSize - pol.cellSize / 10);
+                        pol.posX += pol.cellSize;
+                        break;
+                }
             }
             pol.posX = 0;
             pol.posY += pol.cellSize;
@@ -114,10 +142,21 @@ public class GameView extends View {
         canvas.drawText("Coins: 0", 20, 60, coinsText);
         canvas.drawText("Level: 1", canvas.getWidth() / 2, 60, levelText);
 
-        //Draw character
-        int minCharY = character.getHeight();
-        int maxCharY = 730;
-        character.drawCharacter(canvas);
+        //Gravity check for hitbox of wallblocks
+        pocitadlo += 1;
+        if(pocitadlo == 15) {
+            for (WallBlock tmp : wallBlocks) {
+                if (isThereDownWall(tmp.getTopPosX(), tmp.getTopPosY(), tmp.getSize())) {
+                    Log.i("hmm", "dotyka se");
+                    break;
+                }
+                ;
+                //if (character.posY + character.size )
+
+
+            }
+            pocitadlo = 0;
+        }
         character.moveCharacter(isTouched, direction);
 
         //Draw map
@@ -125,6 +164,20 @@ public class GameView extends View {
 
     }
 
+
+
+    public boolean isThereDownWall(int x, int y, int size){
+        if(character.getPosX() >= x && character.getPosX() <= x + size && character.getPosY() + character.getSize() >= y && character.getPosY() + character.getSize() <= y + 10
+                ||
+           character.getPosX() + character.getSize() >= x && character.getPosX() + character.getSize() <= x + size && character.getPosY() + character.getSize() >= y && character.getPosY() + character.getSize() <= y + 10
+                ){
+            return true;
+        }
+        else {
+            Log.i("levy spodni", "nedotyka se");
+            return false;
+        }
+    }
 
 
 

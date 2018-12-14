@@ -13,7 +13,7 @@ public class Polygon {
     private int cellCount = 10;
     private String[][] polygon = new String[cellCount][cellCount];
 
-    public float cellSize;
+    public int cellSize;
     private float paintX;
     private float paintY;
 
