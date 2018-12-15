@@ -39,15 +39,18 @@ public class GameView extends View {
     private boolean canMoveDown;
     private boolean canMoveLeft;
     private boolean canMoveRight;
+    private boolean canMoveHore;
 
     //Map
     private Polygon pol;
     private ArrayList<WallBlock> wallBlocks = new ArrayList<>();
+    private ArrayList<LadderBlock> ladderBlocks = new ArrayList<>();
     private boolean isCharacterDrawed = false;
 
     //Background images
     private Bitmap bgImage;
     private Bitmap bgBlock;
+    private Bitmap bgLadder;
 
     //Texts
     private Paint coinsText = new Paint();
@@ -66,9 +69,9 @@ public class GameView extends View {
             0,0,0,1,1,1,1,1,1,1,
             0,0,0,0,0,1,0,1,0,0,
             0,0,0,0,0,0,0,0,0,0,
-            0,1,1,1,1,1,0,0,1,1,
-            0,0,0,0,0,0,0,0,0,0,
-            1,0,0,0,2,0,0,0,0,1,
+            0,1,1,1,1,1,3,0,1,1,
+            0,0,0,0,0,0,3,0,0,0,
+            1,0,0,0,2,0,3,0,0,1,
             1,1,1,1,1,1,1,1,1,1
     };
 
@@ -79,6 +82,7 @@ public class GameView extends View {
 
         bgImage = BitmapFactory.decodeResource(getResources(), R.drawable.bgimg);
         bgBlock = BitmapFactory.decodeResource(getResources(), R.drawable.blok);
+        bgLadder = BitmapFactory.decodeResource(getResources(), R.drawable.ladder);
         topBtn = BitmapFactory.decodeResource(getResources(), R.drawable.top_arrow);
         bottomBtn = BitmapFactory.decodeResource(getResources(), R.drawable.bottom_arrow);
         leftBtn = BitmapFactory.decodeResource(getResources(), R.drawable.left_arrow);
@@ -118,6 +122,8 @@ public class GameView extends View {
 
         //Draw map
         pol = new Polygon(canvasWidth, canvasHeight);
+        int tmpPlayerX = 0;
+        int tmpPlayerY = 0;
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
                 switch(level[i*10 + j]){
@@ -125,7 +131,6 @@ public class GameView extends View {
                         pol.posX += pol.cellSize;
                         break;
                     case 1:
-                        //Hitboxy od zdí
                         wallBlocks.add(new WallBlock(pol.posX, pol.posY, pol.cellSize, canvas));
                         canvas.drawBitmap(Bitmap.createScaledBitmap(bgBlock, (int)pol.cellSize, (int)pol.cellSize, true), pol.posX, pol.posY, null);
                         pol.posX += pol.cellSize;
@@ -134,8 +139,13 @@ public class GameView extends View {
                         if(!isCharacterDrawed){
                             character = new Character(pol.posX, pol.posY, characterImg);
                             isCharacterDrawed = true;
+                            character.drawCharacter(canvas, pol.cellSize - pol.cellSize / 10);
                         }
-                        character.drawCharacter(canvas, pol.cellSize - pol.cellSize / 10);
+                        pol.posX += pol.cellSize;
+                        break;
+                    case 3:
+                        ladderBlocks.add(new LadderBlock(pol.posX, pol.posY, pol.cellSize, canvas));
+                        canvas.drawBitmap(Bitmap.createScaledBitmap(bgLadder, (int)pol.cellSize, (int)pol.cellSize, true), pol.posX, pol.posY, null);
                         pol.posX += pol.cellSize;
                         break;
                 }
@@ -143,6 +153,8 @@ public class GameView extends View {
             pol.posX = 0;
             pol.posY += pol.cellSize;
         }
+
+        character.drawCharacter(canvas, pol.cellSize - pol.cellSize / 10);
 
         //Draw infotaintment
         canvas.drawText("Coins: " + coinsCount, 20, 60, coinsText);
@@ -153,6 +165,7 @@ public class GameView extends View {
         canMoveDown = true;
         canMoveLeft = true;
         canMoveRight = true;
+        canMoveHore = false;
         for (WallBlock tmp : wallBlocks) {
             if (isThereDownWall(tmp.getTopPosX(), tmp.getTopPosY(), tmp.getSize())) {
                 canMoveDown = false;
@@ -172,10 +185,17 @@ public class GameView extends View {
                 break;
             }
         }
+        for (LadderBlock tmp : ladderBlocks) {
+            if (isThereLadder(tmp.getTopPosX(), tmp.getTopPosY(), tmp.getSize())) {
+                canMoveHore = true;
+                isFalling = false;
+                break;
+            }
+        }
         if(isFalling) character.characterGravityFall();
 
         //moving
-        character.moveCharacter(isTouched, direction, canMoveDown, canMoveLeft, canMoveRight);
+        character.moveCharacter(isTouched, direction, canMoveDown, canMoveLeft, canMoveRight, canMoveHore);
 
         //Draw map
 
@@ -212,6 +232,18 @@ public class GameView extends View {
         if(character.getPosX() + character.getSize() >= x && character.getPosX() + character.getSize() <= x + 10 && character.getPosY() >= y && character.getPosY() <= y + size
                 ||
            character.getPosX() + character.getSize() >= x && character.getPosX() + character.getSize() <= x + 10 && character.getPosY() + character.getSize() - 15 >= y && character.getPosY() - 15 + character.getSize() <= y + size
+                ){
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    public boolean isThereLadder(int x, int y, int size){
+        if(character.getPosX() + (character.getSize() / 3) >= x + (size / 3) && character.getPosX() + (character.getSize() / 3) <= x + (2 * (size / 3)) && character.getPosY() >= y && character.getPosY() + character.getSize() <= y + size + 10
+                ||
+           character.getPosX() + (2 * (character.getSize() / 3)) >= x + (size / 3) && character.getPosX() + (2 * (character.getSize() / 3)) <= x + (2 * (size / 3)) && character.getPosY() >= y && character.getPosY() + character.getSize() <= y + size + 10
                 ){
             return true;
         }

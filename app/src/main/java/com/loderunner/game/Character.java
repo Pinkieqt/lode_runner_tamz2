@@ -33,7 +33,7 @@ public class Character {
         this.posY += charSpeed + 5;
     }
 
-    public void moveCharacter(boolean isTouched, String direction, boolean canMoveDown, boolean canMoveLeft, boolean canMoveRight){
+    public void moveCharacter(boolean isTouched, String direction, boolean canMoveDown, boolean canMoveLeft, boolean canMoveRight, boolean canMoveHore){
         if(isTouched) {
             if (canMoveLeft){
                 if (direction == "left") {
@@ -53,16 +53,17 @@ public class Character {
                     this.posX += charSpeed;
                 }
             }
-            if(direction == "top"){
-                this.currentImg = img[2];
-                this.posY -= charSpeed;
+            if(canMoveHore) {
+                if (direction == "top") {
+                    this.currentImg = img[2];
+                    this.posY -= charSpeed;
+                }
             }
         }
     }
 
     public void drawCharacter(Canvas canvas, int size){
         this.size = size;
-        int centerCirclePos = size / 2;
         canvas.drawBitmap(Bitmap.createScaledBitmap(this.currentImg, (int)size, (int)size, true), this.posX, this.posY, null);
     }
 
