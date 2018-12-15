@@ -29,6 +29,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="32dp"
         android:text="Play"
+        android:onClick="startGame"
         app:layout_constraintBottom_toTopOf="@+id/butscore"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -41,6 +42,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:text="Scoreboard"
+        android:onClick="showScore"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:layout_editor_absoluteY="202dp" />
@@ -54,6 +56,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="Exit"
+        android:onClick="exitApp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

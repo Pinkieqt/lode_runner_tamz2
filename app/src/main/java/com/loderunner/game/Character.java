@@ -7,7 +7,7 @@ import android.graphics.Paint;
 import android.util.Log;
 
 public class Character {
-    public int charSpeed = 15;
+    public int charSpeed = 10;
     private int posX;
     private int posY;
     private int size;
@@ -30,18 +30,20 @@ public class Character {
     }
 
     public void characterGravityFall(){
-        this.posY -= charSpeed;
+        this.posY += charSpeed + 5;
     }
 
-    public void moveCharacter(boolean isTouched, String direction){
+    public void moveCharacter(boolean isTouched, String direction, boolean canMoveDown){
         if(isTouched){
             if(direction == "left"){
                 //github prostě nefunguje?
                 this.currentImg = img[0];
                 this.posX -= charSpeed;
             }
-            if(direction == "bottom"){
-                this.posY += charSpeed;
+            if(canMoveDown) {
+                if (direction == "bottom") {
+                    this.posY += charSpeed;
+                }
             }
             if(direction == "right"){
                 this.currentImg = img[1];

@@ -14,7 +14,7 @@ public class MainActivity extends Activity {
 
     private GameView gameView;
     private Handler handler = new Handler();
-    private final static long TIMER_INTERVAL = 30;
+    private final static long TIMER_INTERVAL = 15;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

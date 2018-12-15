@@ -33,6 +33,10 @@ public class GameView extends View {
     //Character
     private Bitmap characterImg[] = new Bitmap[3];
     private Character character = new Character(400, 400, characterImg);
+    private int coinsCount = 0;
+    private String levelNum = "1";
+    private boolean isFalling;
+    private boolean canMoveDown;
 
     //Map
     private Polygon pol;
@@ -54,16 +58,16 @@ public class GameView extends View {
 
     //Level
     private int level[] = {
-            0,1,0,0,0,0,0,0,0,0,
-            0,0,0,1,1,0,0,1,1,0,
             0,0,0,0,0,0,0,0,0,0,
-            0,0,0,1,1,1,1,1,1,0,
+            1,1,0,1,1,0,0,1,1,1,
+            0,0,0,0,0,0,0,0,0,0,
+            0,0,0,1,1,1,1,1,1,1,
             0,0,0,0,0,1,0,1,0,0,
-            0,1,0,0,0,0,0,0,0,0,
-            0,1,1,1,1,1,0,0,1,0,
+            0,0,0,0,0,0,0,0,0,0,
+            0,1,1,1,1,1,0,0,1,1,
             0,0,0,0,0,0,0,0,0,0,
             0,0,0,0,2,0,0,0,0,0,
-            0,1,1,1,1,1,1,1,1,0
+            1,1,1,1,1,1,1,1,1,1
     };
 
 
@@ -139,25 +143,23 @@ public class GameView extends View {
         }
 
         //Draw infotaintment
-        canvas.drawText("Coins: 0", 20, 60, coinsText);
-        canvas.drawText("Level: 1", canvas.getWidth() / 2, 60, levelText);
+        canvas.drawText("Coins: " + coinsCount, 20, 60, coinsText);
+        canvas.drawText("Level: " + levelNum, canvas.getWidth() / 2, 60, levelText);
 
         //Gravity check for hitbox of wallblocks
-        pocitadlo += 1;
-        if(pocitadlo == 15) {
-            for (WallBlock tmp : wallBlocks) {
-                if (isThereDownWall(tmp.getTopPosX(), tmp.getTopPosY(), tmp.getSize())) {
-                    Log.i("hmm", "dotyka se");
-                    break;
-                }
-                ;
-                //if (character.posY + character.size )
-
-
+        isFalling = true;
+        canMoveDown = true;
+        for (WallBlock tmp : wallBlocks) {
+            if (isThereDownWall(tmp.getTopPosX(), tmp.getTopPosY(), tmp.getSize())) {
+                canMoveDown = false;
+                isFalling = false;
+                break;
             }
-            pocitadlo = 0;
         }
-        character.moveCharacter(isTouched, direction);
+        if(isFalling) character.characterGravityFall();
+
+        //moving
+        character.moveCharacter(isTouched, direction, canMoveDown);
 
         //Draw map
 
@@ -174,7 +176,6 @@ public class GameView extends View {
             return true;
         }
         else {
-            Log.i("levy spodni", "nedotyka se");
             return false;
         }
     }
