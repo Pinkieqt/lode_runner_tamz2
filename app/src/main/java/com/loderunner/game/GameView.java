@@ -45,12 +45,14 @@ public class GameView extends View {
     private Polygon pol;
     private ArrayList<WallBlock> wallBlocks = new ArrayList<>();
     private ArrayList<LadderBlock> ladderBlocks = new ArrayList<>();
+    private ArrayList<CoinBlock> coinBlocks = new ArrayList<>();
     private boolean isCharacterDrawed = false;
 
     //Background images
     private Bitmap bgImage;
     private Bitmap bgBlock;
     private Bitmap bgLadder;
+    private Bitmap bgCoin;
 
     //Texts
     private Paint coinsText = new Paint();
@@ -71,7 +73,7 @@ public class GameView extends View {
             0,0,0,0,0,0,0,0,0,0,
             0,1,1,1,1,1,3,0,1,1,
             0,0,0,0,0,0,3,0,0,0,
-            1,0,0,0,2,0,3,0,0,1,
+            1,0,0,0,2,0,3,4,0,1,
             1,1,1,1,1,1,1,1,1,1
     };
 
@@ -82,7 +84,8 @@ public class GameView extends View {
 
         bgImage = BitmapFactory.decodeResource(getResources(), R.drawable.bgimg);
         bgBlock = BitmapFactory.decodeResource(getResources(), R.drawable.blok);
-        bgLadder = BitmapFactory.decodeResource(getResources(), R.drawable.ladder);
+        bgLadder = BitmapFactory.decodeResource(getResources(), R.drawable.ladderwithbg);
+        bgCoin = BitmapFactory.decodeResource(getResources(), R.drawable.coinwithbg);
         topBtn = BitmapFactory.decodeResource(getResources(), R.drawable.top_arrow);
         bottomBtn = BitmapFactory.decodeResource(getResources(), R.drawable.bottom_arrow);
         leftBtn = BitmapFactory.decodeResource(getResources(), R.drawable.left_arrow);
@@ -148,6 +151,11 @@ public class GameView extends View {
                         canvas.drawBitmap(Bitmap.createScaledBitmap(bgLadder, (int)pol.cellSize, (int)pol.cellSize, true), pol.posX, pol.posY, null);
                         pol.posX += pol.cellSize;
                         break;
+                    case 4:
+                        coinBlocks.add(new CoinBlock(pol.posX, pol.posY, pol.cellSize, canvas));
+                        canvas.drawBitmap(Bitmap.createScaledBitmap(bgCoin, (int)pol.cellSize, (int)pol.cellSize, true), pol.posX, pol.posY, null);
+                        pol.posX += pol.cellSize;
+                        break;
                 }
             }
             pol.posX = 0;
@@ -160,7 +168,7 @@ public class GameView extends View {
         canvas.drawText("Coins: " + coinsCount, 20, 60, coinsText);
         canvas.drawText("Level: " + levelNum, canvas.getWidth() / 2, 60, levelText);
 
-        //Gravity check for hitbox of wallblocks
+
         isFalling = true;
         canMoveDown = true;
         canMoveLeft = true;
@@ -189,6 +197,12 @@ public class GameView extends View {
             if (isThereLadder(tmp.getTopPosX(), tmp.getTopPosY(), tmp.getSize())) {
                 canMoveHore = true;
                 isFalling = false;
+                break;
+            }
+        }
+        for (CoinBlock tmp : coinBlocks) {
+            if (isThereCoin(tmp.getTopPosX(), tmp.getTopPosY(), tmp.getSize())) {
+                coinsCount += 1;
                 break;
             }
         }
@@ -244,6 +258,18 @@ public class GameView extends View {
         if(character.getPosX() + (character.getSize() / 3) >= x + (size / 3) && character.getPosX() + (character.getSize() / 3) <= x + (2 * (size / 3)) && character.getPosY() >= y && character.getPosY() + character.getSize() <= y + size + 10
                 ||
            character.getPosX() + (2 * (character.getSize() / 3)) >= x + (size / 3) && character.getPosX() + (2 * (character.getSize() / 3)) <= x + (2 * (size / 3)) && character.getPosY() >= y && character.getPosY() + character.getSize() <= y + size + 10
+                ){
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    public boolean isThereCoin(int x, int y, int size){
+        if(character.getPosX() + (character.getSize() / 3) >= x + (size / 3) && character.getPosX() + (character.getSize() / 3) <= x + (2 * (size / 3)) && character.getPosY() >= y && character.getPosY() + character.getSize() <= y + size + 10
+                ||
+                character.getPosX() + (2 * (character.getSize() / 3)) >= x + (size / 3) && character.getPosX() + (2 * (character.getSize() / 3)) <= x + (2 * (size / 3)) && character.getPosY() >= y && character.getPosY() + character.getSize() <= y + size + 10
                 ){
             return true;
         }
