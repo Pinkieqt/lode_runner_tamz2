@@ -37,6 +37,8 @@ public class GameView extends View {
     private String levelNum = "1";
     private boolean isFalling;
     private boolean canMoveDown;
+    private boolean canMoveLeft;
+    private boolean canMoveRight;
 
     //Map
     private Polygon pol;
@@ -66,7 +68,7 @@ public class GameView extends View {
             0,0,0,0,0,0,0,0,0,0,
             0,1,1,1,1,1,0,0,1,1,
             0,0,0,0,0,0,0,0,0,0,
-            0,0,0,0,2,0,0,0,0,0,
+            1,0,0,0,2,0,0,0,0,1,
             1,1,1,1,1,1,1,1,1,1
     };
 
@@ -149,6 +151,8 @@ public class GameView extends View {
         //Gravity check for hitbox of wallblocks
         isFalling = true;
         canMoveDown = true;
+        canMoveLeft = true;
+        canMoveRight = true;
         for (WallBlock tmp : wallBlocks) {
             if (isThereDownWall(tmp.getTopPosX(), tmp.getTopPosY(), tmp.getSize())) {
                 canMoveDown = false;
@@ -156,10 +160,22 @@ public class GameView extends View {
                 break;
             }
         }
+        for (WallBlock tmp : wallBlocks) {
+            if (isThereLeftWall(tmp.getTopPosX(), tmp.getTopPosY(), tmp.getSize())) {
+                canMoveLeft = false;
+                break;
+            }
+        }
+        for (WallBlock tmp : wallBlocks) {
+            if (isThereRightWall(tmp.getTopPosX(), tmp.getTopPosY(), tmp.getSize())) {
+                canMoveRight = false;
+                break;
+            }
+        }
         if(isFalling) character.characterGravityFall();
 
         //moving
-        character.moveCharacter(isTouched, direction, canMoveDown);
+        character.moveCharacter(isTouched, direction, canMoveDown, canMoveLeft, canMoveRight);
 
         //Draw map
 
@@ -180,6 +196,30 @@ public class GameView extends View {
         }
     }
 
+    public boolean isThereLeftWall(int x, int y, int size){
+        if(character.getPosX() >= x + size - 10 && character.getPosX() <= x + size && character.getPosY() >= y && character.getPosY() <= y + size
+                ||
+           character.getPosX() >= x + size - 10 && character.getPosX() <= x + size && character.getPosY() + character.getSize() - 15 >= y && character.getPosY() - 15 + character.getSize() <= y + size
+                ){
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    public boolean isThereRightWall(int x, int y, int size){
+        if(character.getPosX() + character.getSize() >= x && character.getPosX() + character.getSize() <= x + 10 && character.getPosY() >= y && character.getPosY() <= y + size
+                ||
+           character.getPosX() + character.getSize() >= x && character.getPosX() + character.getSize() <= x + 10 && character.getPosY() + character.getSize() - 15 >= y && character.getPosY() - 15 + character.getSize() <= y + size
+                ){
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
 
 
 
@@ -192,7 +232,7 @@ public class GameView extends View {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 //left
-                if(x > ((canvasWidth / 5) - 50) && x < ((canvasWidth / 5) - 50 + 225) &&  y > (canvasHeight - (canvasHeight / 10) - 50) && y < (canvasHeight - (canvasHeight / 10) - 50) + 225){
+                if (x > ((canvasWidth / 5) - 50) && x < ((canvasWidth / 5) - 50 + 225) && y > (canvasHeight - (canvasHeight / 10) - 50) && y < (canvasHeight - (canvasHeight / 10) - 50) + 225) {
                     isTouched = true;
                     direction = "left";
                 }
@@ -202,7 +242,7 @@ public class GameView extends View {
                     direction = "bottom";
                 }
                 //right
-                if(x > ((canvasWidth / 5) * 3 + 50) && x < ((canvasWidth / 5) * 3 + 50 + 225) &&  y > (canvasHeight - (canvasHeight / 10) - 50) && y < (canvasHeight - (canvasHeight / 10) - 50) + 225){
+                if (x > ((canvasWidth / 5) * 3 + 50) && x < ((canvasWidth / 5) * 3 + 50 + 225) && y > (canvasHeight - (canvasHeight / 10) - 50) && y < (canvasHeight - (canvasHeight / 10) - 50) + 225) {
                     isTouched = true;
                     direction = "right";
                 }

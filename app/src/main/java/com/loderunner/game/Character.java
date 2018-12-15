@@ -33,21 +33,25 @@ public class Character {
         this.posY += charSpeed + 5;
     }
 
-    public void moveCharacter(boolean isTouched, String direction, boolean canMoveDown){
-        if(isTouched){
-            if(direction == "left"){
-                //github prostě nefunguje?
-                this.currentImg = img[0];
-                this.posX -= charSpeed;
+    public void moveCharacter(boolean isTouched, String direction, boolean canMoveDown, boolean canMoveLeft, boolean canMoveRight){
+        if(isTouched) {
+            if (canMoveLeft){
+                if (direction == "left") {
+                    //github prostě nefunguje?
+                    this.currentImg = img[0];
+                    this.posX -= charSpeed;
+                }
             }
             if(canMoveDown) {
                 if (direction == "bottom") {
                     this.posY += charSpeed;
                 }
             }
-            if(direction == "right"){
-                this.currentImg = img[1];
-                this.posX += charSpeed;
+            if(canMoveRight) {
+                if (direction == "right") {
+                    this.currentImg = img[1];
+                    this.posX += charSpeed;
+                }
             }
             if(direction == "top"){
                 this.currentImg = img[2];

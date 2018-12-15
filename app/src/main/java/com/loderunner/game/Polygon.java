@@ -17,8 +17,6 @@ public class Polygon {
     private float paintX;
     private float paintY;
 
-
-
     public Polygon(int cvwidth, int cvheight) {
         //Velikost screenu
         this.width = cvwidth;
@@ -53,4 +51,14 @@ public class Polygon {
             y += 50;
         }
     }
+
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
 }
