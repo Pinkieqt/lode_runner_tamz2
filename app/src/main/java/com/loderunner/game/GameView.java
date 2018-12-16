@@ -22,7 +22,7 @@ import java.util.ArrayList;
 public class GameView extends View {
 
     //Helping
-    int pocitadlo;
+    private boolean isDead = false;
 
     //Canvas
     private int canvasWidth;
@@ -38,6 +38,7 @@ public class GameView extends View {
     private Bitmap characterImg[] = new Bitmap[3];
     private Character character = new Character(400, 400, characterImg);
     private int coinsCount = 0;
+    private int zbyvajiciCoins = 0;
     private String levelNum = "1";
     private boolean isFalling;
     private boolean canMoveDown;
@@ -70,6 +71,7 @@ public class GameView extends View {
 
     //Texts
     private Paint coinsText = new Paint();
+    private Paint zbyvacijiciCoinsText = new Paint();
     private Paint levelText = new Paint();
 
     //Touch check - moving bool
@@ -118,6 +120,7 @@ public class GameView extends View {
         coinsText.setColor(Color.WHITE);
         coinsText.setTextSize(32);
         coinsText.setTypeface(Typeface.DEFAULT_BOLD);
+        coinsText.setTextAlign(Paint.Align.LEFT);
         coinsText.setAntiAlias(true);
 
         //level
@@ -126,6 +129,14 @@ public class GameView extends View {
         levelText.setTypeface(Typeface.DEFAULT_BOLD);
         levelText.setTextAlign(Paint.Align.CENTER);
         levelText.setAntiAlias(true);
+
+        //score zbyvajici
+        zbyvacijiciCoinsText.setColor(Color.WHITE);
+        zbyvacijiciCoinsText.setTextSize(32);
+        zbyvacijiciCoinsText.setTypeface(Typeface.DEFAULT_BOLD);
+        zbyvacijiciCoinsText.setTextAlign(Paint.Align.RIGHT);
+        zbyvacijiciCoinsText.setAntiAlias(true);
+
     }
 
     @SuppressLint("DrawAllocation")
@@ -172,6 +183,7 @@ public class GameView extends View {
                         pol.posX += pol.cellSize;
                         break;
                     case 4:
+                        zbyvajiciCoins++;
                         coinBlocks.add(new CoinBlock(pol.posX, pol.posY, pol.cellSize, canvas));
                         canvas.drawBitmap(Bitmap.createScaledBitmap(bgCoin, (int)pol.cellSize, (int)pol.cellSize, true), pol.posX, pol.posY, null);
                         pol.posX += pol.cellSize;
@@ -202,6 +214,7 @@ public class GameView extends View {
         //Draw infotaintment
         canvas.drawText("Coins: " + coinsCount, 20, 60, coinsText);
         canvas.drawText("Level: " + levelNum, canvas.getWidth() / 2, 60, levelText);
+        canvas.drawText("Remaining: " + zbyvajiciCoins, canvas.getWidth(), 60, zbyvacijiciCoinsText);
 
 
         isFalling = true;
@@ -209,6 +222,7 @@ public class GameView extends View {
         canMoveLeft = true;
         canMoveRight = true;
         canMoveHore = false;
+        
         for (WallBlock tmp : wallBlocks) {
             if (isThereDownWall(tmp.getTopPosX(), tmp.getTopPosY(), tmp.getSize())) {
                 canMoveDown = false;
@@ -244,16 +258,22 @@ public class GameView extends View {
 
         //Enemy detection
         if(isThereEnemy(enemy.getPosX(), enemy.getPosY(), enemy.getSize())){
-            String value = Integer.toString(coinsCount);
-            Intent intent = new Intent(getContext(), GameOverActivity.class);
-            intent.putExtra("score", value);
-            getContext().startActivity(intent);
+            if(!isDead) {
+                String value = Integer.toString(coinsCount);
+                Intent intent = new Intent(getContext(), GameOverActivity.class);
+                intent.putExtra("score", value);
+                getContext().startActivity(intent);
+            }
+            isDead = true;
         }
         if(isThereEnemy(enemy2.getPosX(), enemy2.getPosY(), enemy2.getSize())){
-            String value = Integer.toString(coinsCount);
-            Intent intent = new Intent(getContext(), GameOverActivity.class);
-            intent.putExtra("score", value);
-            getContext().startActivity(intent);
+            if(!isDead) {
+                String value = Integer.toString(coinsCount);
+                Intent intent = new Intent(getContext(), GameOverActivity.class);
+                intent.putExtra("score", value);
+                getContext().startActivity(intent);
+            }
+            isDead = true;
         }
 
 
