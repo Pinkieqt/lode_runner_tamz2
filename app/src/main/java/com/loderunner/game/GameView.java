@@ -89,7 +89,7 @@ public class GameView extends View {
     private int level[] = {
             1,0,0,0,0,0,0,0,0,1,
             1,1,0,1,1,0,0,1,1,1,
-            1,0,5,0,0,0,0,0,0,1,
+            1,0,5,0,4,0,0,0,0,1,
             1,0,3,1,1,1,1,1,1,1,
             1,0,3,0,0,1,0,1,0,1,
             1,0,3,0,0,5,0,0,0,1,
@@ -311,6 +311,16 @@ public class GameView extends View {
             isDead = true;
         }
         if(isThereEnemy(enemy2.getPosX(), enemy2.getPosY(), enemy2.getSize())){
+            if(!isDead) {
+                String value = Integer.toString(coinsCount);
+                Intent intent = new Intent(getContext(), GameOverActivity.class);
+                intent.putExtra("score", value);
+                getContext().startActivity(intent);
+            }
+            isDead = true;
+        }
+
+        if(coinsCount == 14) {
             if(!isDead) {
                 String value = Integer.toString(coinsCount);
                 Intent intent = new Intent(getContext(), GameOverActivity.class);
