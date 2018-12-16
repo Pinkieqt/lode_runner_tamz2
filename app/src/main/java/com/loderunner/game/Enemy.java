@@ -9,6 +9,7 @@ public class Enemy extends BaseChar {
 
     public Enemy(int posX, int posY, Bitmap[] x) {
         super(posX, posY, x);
+        this.posY = this.posY + 5;
         defaultX = posX;
     }
 

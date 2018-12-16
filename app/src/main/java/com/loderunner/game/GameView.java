@@ -2,12 +2,14 @@ package com.loderunner.game;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.app.Activity;
 import android.graphics.Typeface;
 import android.media.MediaPlayer;
 import android.util.Log;
@@ -74,6 +76,8 @@ public class GameView extends View {
     private boolean isTouched = false;
     private String direction;
 
+    private Context cont;
+
 
     //Level
     private int level[] = {
@@ -93,6 +97,7 @@ public class GameView extends View {
 
     public GameView(Context context) {
         super(context);
+        cont = context;
         mPlayer = MediaPlayer.create(context, R.raw.coinsound);
         bgImage = BitmapFactory.decodeResource(getResources(), R.drawable.bgimg);
         bgBlock = BitmapFactory.decodeResource(getResources(), R.drawable.blok);
@@ -236,6 +241,24 @@ public class GameView extends View {
                 break;
             }
         }
+
+        //Enemy detection
+        if(isThereEnemy(enemy.getPosX(), enemy.getPosY(), enemy.getSize())){
+            String value = Integer.toString(coinsCount);
+            Intent intent = new Intent(getContext(), GameOverActivity.class);
+            intent.putExtra("score", value);
+            getContext().startActivity(intent);
+        }
+        if(isThereEnemy(enemy2.getPosX(), enemy2.getPosY(), enemy2.getSize())){
+            String value = Integer.toString(coinsCount);
+            Intent intent = new Intent(getContext(), GameOverActivity.class);
+            intent.putExtra("score", value);
+            getContext().startActivity(intent);
+        }
+
+
+
+        //Gravity falling
         if(isFalling) character.characterGravityFall();
 
         //moving
@@ -249,6 +272,8 @@ public class GameView extends View {
     }
 
 
+
+    //Detection methods
 
     public boolean isThereDownWall(int x, int y, int size){
         if(character.getPosX() >= x && character.getPosX() <= x + size && character.getPosY() + character.getSize() >= y && character.getPosY() + character.getSize() <= y + 10
@@ -287,9 +312,9 @@ public class GameView extends View {
     }
 
     public boolean isThereLadder(int x, int y, int size){
-        if(character.getPosX() + (character.getSize() / 3) >= x + (size / 3) && character.getPosX() + (character.getSize() / 3) <= x + (2 * (size / 3)) && character.getPosY() >= y - 50&& character.getPosY() + character.getSize() <= y + size + 10
+        if(character.getPosX() + (character.getSize() / 3) >= x + (size / 3) && character.getPosX() + (character.getSize() / 3) <= x + (2 * (size / 3)) && character.getPosY() >= y - (size) && character.getPosY() + character.getSize() <= y + size + 10
                 ||
-           character.getPosX() + (2 * (character.getSize() / 3)) >= x + (size / 3) && character.getPosX() + (2 * (character.getSize() / 3)) <= x + (2 * (size / 3)) && character.getPosY() >= y - 50 && character.getPosY() + character.getSize() <= y + size + 10
+           character.getPosX() + (2 * (character.getSize() / 3)) >= x + (size / 3) && character.getPosX() + (2 * (character.getSize() / 3)) <= x + (2 * (size / 3)) && character.getPosY() >= y - (size) && character.getPosY() + character.getSize() <= y + size + 10
                 ){
             return true;
         }
@@ -310,8 +335,17 @@ public class GameView extends View {
         }
     }
 
-
-
+    public boolean isThereEnemy(int x, int y, int size){
+        if(character.getPosX() >= x + 15 && character.getPosX() <= x + size - 15 && character.getPosY() >= y + 15 && character.getPosY() + character.getSize() <= y + size + 15
+                ||
+                character.getPosX() + character.getSize() >= x + 15 && character.getPosX() + character.getSize() <= x + size - 15 && character.getPosY() + character.getSize() >= y + 15 && character.getPosY() + character.getSize() <= y + size + 15
+                ){
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
 
     //On touch
     @Override

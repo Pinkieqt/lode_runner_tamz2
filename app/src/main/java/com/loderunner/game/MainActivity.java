@@ -30,6 +30,7 @@ public class MainActivity extends Activity {
         gameView = new GameView(this);
         setContentView(gameView);
 
+
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
