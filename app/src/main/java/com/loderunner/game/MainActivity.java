@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
 
+import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -27,7 +28,12 @@ public class MainActivity extends Activity {
         // Set No Title
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-        gameView = new GameView(this);
+        try{
+            gameView = new GameView(this);
+        }
+        catch(IOException e){
+
+        }
         setContentView(gameView);
 
 

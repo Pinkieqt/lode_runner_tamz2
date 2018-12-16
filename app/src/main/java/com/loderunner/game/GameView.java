@@ -17,6 +17,10 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 public class GameView extends View {
@@ -40,7 +44,7 @@ public class GameView extends View {
     private Character character = new Character(400, 400, characterImg);
     private int coinsCount = 0;
     private int pocetCoinu = 0;
-    private String levelNum = "1";
+    private int levelNum = 1;
     private boolean isFalling;
     private boolean canMoveDown;
     private boolean canMoveLeft;
@@ -83,21 +87,21 @@ public class GameView extends View {
 
     //Level
     private int level[] = {
-            0,0,0,0,0,0,0,0,0,0,
+            1,0,0,0,0,0,0,0,0,1,
             1,1,0,1,1,0,0,1,1,1,
-            0,0,5,0,4,0,0,0,0,0,
-            0,0,3,1,1,1,1,1,1,1,
-            0,0,3,0,0,1,0,1,0,0,
-            0,0,3,0,0,5,0,0,0,0,
-            0,1,1,1,1,1,3,0,1,1,
-            0,0,0,0,0,0,3,0,0,0,
+            1,0,5,0,0,0,0,0,0,1,
+            1,0,3,1,1,1,1,1,1,1,
+            1,0,3,0,0,1,0,1,0,1,
+            1,0,3,0,0,5,0,0,0,1,
+            1,1,1,1,1,1,3,0,1,1,
+            1,0,0,0,0,0,3,0,0,1,
             1,0,0,0,2,0,3,4,0,1,
             1,1,1,1,1,1,1,1,1,1
     };
 
 
 
-    public GameView(Context context) {
+    public GameView(Context context) throws IOException{
         super(context);
         cont = context;
         mPlayer = MediaPlayer.create(context, R.raw.coinsound);
@@ -135,7 +139,7 @@ public class GameView extends View {
 
     @SuppressLint("DrawAllocation")
     @Override
-    protected void onDraw(Canvas canvas) {
+    protected void onDraw(Canvas canvas){
         canvasWidth = canvas.getWidth();
         canvasHeight = canvas.getHeight();
 
@@ -278,7 +282,20 @@ public class GameView extends View {
                 coinBlocks.remove(tmp);
 
 
-                
+                //Kontrola jestli dosbíral všechny coiny
+                if(coinBlocks.isEmpty()){
+                    levelNum++;
+                    try{
+                        areCoinsDrawed = false;
+                        isEnemyDrawed = false;
+                        isEnemy2Drawed = false;
+                        isCharacterDrawed = false;
+                        loadNextLevel();
+                    }
+                    catch(IOException x){
+
+                    }
+                }
                 break;
             }
         }
@@ -318,6 +335,47 @@ public class GameView extends View {
 
     }
 
+
+    //Loading next level
+    private void loadNextLevel() throws IOException {
+        InputStream inputStream;
+        switch(levelNum){
+            case 2:
+                inputStream = getResources().openRawResource(R.raw.map2);
+                break;
+            case 3:
+                inputStream = getResources().openRawResource(R.raw.map3);
+                break;
+            case 4:
+                inputStream = getResources().openRawResource(R.raw.map4);
+                break;
+            default:
+                inputStream = getResources().openRawResource(R.raw.map1);
+                break;
+        }
+        String line;
+        ArrayList<Integer> values = new ArrayList<>();
+        BufferedReader r = new BufferedReader(new InputStreamReader(inputStream));
+
+        while((line = r.readLine()) != null){
+            char [] charArray = line.toCharArray();
+            for (char ch : charArray){
+                try{
+                    if (ch != ','){
+                        int x = (int)(ch)-48;
+                        values.add(x);
+                    }
+                }catch(Exception e){
+
+                }
+            }
+        }
+
+        for (int j = 0; j < level.length; j++){
+            level[j] = values.get(j);
+        }
+        inputStream.close();
+    }
 
 
     //Detection methods
