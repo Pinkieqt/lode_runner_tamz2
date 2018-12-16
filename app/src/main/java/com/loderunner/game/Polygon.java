@@ -27,11 +27,6 @@ public class Polygon {
         this.cellSize = this.width / this.cellCount;
     }
 
-    public void drawBitmap(Context context, Bitmap image, int posX, int poY){
-
-    }
-
-
     public void drawMap(Canvas canvas){
         int x = 0;
         int y = 0;

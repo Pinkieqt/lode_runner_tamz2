@@ -23,6 +23,7 @@ public class GameView extends View {
 
     //Helping
     private boolean isDead = false;
+    private boolean oneTime = false;
 
     //Canvas
     private int canvasWidth;
@@ -38,7 +39,7 @@ public class GameView extends View {
     private Bitmap characterImg[] = new Bitmap[3];
     private Character character = new Character(400, 400, characterImg);
     private int coinsCount = 0;
-    private int zbyvajiciCoins = 0;
+    private int pocetCoinu = 0;
     private String levelNum = "1";
     private boolean isFalling;
     private boolean canMoveDown;
@@ -71,7 +72,6 @@ public class GameView extends View {
 
     //Texts
     private Paint coinsText = new Paint();
-    private Paint zbyvacijiciCoinsText = new Paint();
     private Paint levelText = new Paint();
 
     //Touch check - moving bool
@@ -79,7 +79,7 @@ public class GameView extends View {
     private String direction;
 
     private Context cont;
-
+    private boolean areCoinsDrawed = false;
 
     //Level
     private int level[] = {
@@ -130,12 +130,6 @@ public class GameView extends View {
         levelText.setTextAlign(Paint.Align.CENTER);
         levelText.setAntiAlias(true);
 
-        //score zbyvajici
-        zbyvacijiciCoinsText.setColor(Color.WHITE);
-        zbyvacijiciCoinsText.setTextSize(32);
-        zbyvacijiciCoinsText.setTypeface(Typeface.DEFAULT_BOLD);
-        zbyvacijiciCoinsText.setTextAlign(Paint.Align.RIGHT);
-        zbyvacijiciCoinsText.setAntiAlias(true);
 
     }
 
@@ -153,6 +147,16 @@ public class GameView extends View {
         canvas.drawBitmap(bottomBtn, (canvasWidth / 5) * 2, canvasHeight - (canvasHeight / 10) - 50, null);
         canvas.drawBitmap(rightBtn, (canvasWidth / 5) * 3 + 50, canvasHeight - (canvasHeight / 10) - 50, null);
         canvas.drawBitmap(topBtn, (canvasWidth / 5) * 2, canvasHeight - ((canvasHeight / 10) * 2) - 130, null);
+
+        if(!oneTime) {
+            for (int tmp : level) {
+                if (tmp == 4) {
+                    pocetCoinu++;
+
+                }
+            }
+            oneTime = true;
+        }
 
         //Draw map
         pol = new Polygon(canvasWidth, canvasHeight);
@@ -183,10 +187,13 @@ public class GameView extends View {
                         pol.posX += pol.cellSize;
                         break;
                     case 4:
-                        zbyvajiciCoins++;
-                        coinBlocks.add(new CoinBlock(pol.posX, pol.posY, pol.cellSize, canvas));
-                        canvas.drawBitmap(Bitmap.createScaledBitmap(bgCoin, (int)pol.cellSize, (int)pol.cellSize, true), pol.posX, pol.posY, null);
-                        pol.posX += pol.cellSize;
+                        if(pocetCoinu > 0) {
+                            if(!areCoinsDrawed) {
+                                coinBlocks.add(new CoinBlock(pol.posX, pol.posY, pol.cellSize, canvas));
+                            }
+                            canvas.drawBitmap(Bitmap.createScaledBitmap(bgCoin, (int) pol.cellSize, (int) pol.cellSize, true), pol.posX, pol.posY, null);
+                            pol.posX += pol.cellSize;
+                        }
                         break;
                     case 5:
                         if(!isEnemy2Drawed && isEnemyDrawed) {
@@ -207,6 +214,8 @@ public class GameView extends View {
             pol.posY += pol.cellSize;
         }
 
+        areCoinsDrawed = true;
+
         character.drawCharacter(canvas, pol.cellSize - pol.cellSize / 10);
         enemy.drawCharacter(canvas, pol.cellSize - pol.cellSize / 10);
         enemy2.drawCharacter(canvas, pol.cellSize - pol.cellSize / 10);
@@ -214,7 +223,6 @@ public class GameView extends View {
         //Draw infotaintment
         canvas.drawText("Coins: " + coinsCount, 20, 60, coinsText);
         canvas.drawText("Level: " + levelNum, canvas.getWidth() / 2, 60, levelText);
-        canvas.drawText("Remaining: " + zbyvajiciCoins, canvas.getWidth(), 60, zbyvacijiciCoinsText);
 
 
         isFalling = true;
@@ -222,7 +230,7 @@ public class GameView extends View {
         canMoveLeft = true;
         canMoveRight = true;
         canMoveHore = false;
-        
+
         for (WallBlock tmp : wallBlocks) {
             if (isThereDownWall(tmp.getTopPosX(), tmp.getTopPosY(), tmp.getSize())) {
                 canMoveDown = false;
@@ -251,7 +259,26 @@ public class GameView extends View {
         for (CoinBlock tmp : coinBlocks) {
             if (isThereCoin(tmp.getTopPosX(), tmp.getTopPosY(), tmp.getSize())) {
                 mPlayer.start();
-                coinsCount += 1;
+                if(!tmp.isEated){
+                    coinsCount += 1;
+                    tmp.isEated = true;
+                }
+
+
+                int tmpIndex = coinBlocks.indexOf(tmp);
+                int helpPocitadlo = -1;
+                for(int i = 0; i < level.length; i++){
+                    if(level[i] == 4){
+                        helpPocitadlo++;
+                        if(helpPocitadlo == tmpIndex){
+                            level[i] = 0;
+                        }
+                    }
+                }
+                coinBlocks.remove(tmp);
+
+
+                
                 break;
             }
         }
@@ -356,9 +383,9 @@ public class GameView extends View {
     }
 
     public boolean isThereEnemy(int x, int y, int size){
-        if(character.getPosX() >= x + 15 && character.getPosX() <= x + size - 15 && character.getPosY() >= y + 15 && character.getPosY() + character.getSize() <= y + size + 15
+        if(character.getPosX() >= x + 30 && character.getPosX() <= x + size - 5 && character.getPosY() >= y + 15 && character.getPosY() + character.getSize() <= y + size + 15
                 ||
-                character.getPosX() + character.getSize() >= x + 15 && character.getPosX() + character.getSize() <= x + size - 15 && character.getPosY() + character.getSize() >= y + 15 && character.getPosY() + character.getSize() <= y + size + 15
+                character.getPosX() + character.getSize() >= x + 30 && character.getPosX() + character.getSize() <= x + size - 5 && character.getPosY() + character.getSize() >= y + 15 && character.getPosY() + character.getSize() <= y + size + 15
                 ){
             return true;
         }
