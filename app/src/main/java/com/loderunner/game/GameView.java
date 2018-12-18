@@ -92,7 +92,7 @@ public class GameView extends View {
             1,0,5,0,4,0,0,0,0,1,
             1,0,3,1,1,1,1,1,1,1,
             1,0,3,0,0,1,0,1,0,1,
-            1,0,3,0,0,5,0,0,0,1,
+            1,0,3,0,0,0,5,0,0,1,
             1,1,1,1,1,1,3,0,1,1,
             1,0,0,0,0,0,3,0,0,1,
             1,0,0,0,2,0,3,4,0,1,
@@ -140,6 +140,8 @@ public class GameView extends View {
     @SuppressLint("DrawAllocation")
     @Override
     protected void onDraw(Canvas canvas){
+        wallBlocks = new ArrayList<>();
+        ladderBlocks = new ArrayList<>();
         canvasWidth = canvas.getWidth();
         canvasHeight = canvas.getHeight();
 
@@ -235,6 +237,12 @@ public class GameView extends View {
         canMoveRight = true;
         canMoveHore = false;
 
+        for (LadderBlock tmp : ladderBlocks) {
+            if (isThereLadder(tmp.getTopPosX(), tmp.getTopPosY(), tmp.getSize())) {
+                canMoveHore = true;
+                isFalling = false;
+            }
+        }
         for (WallBlock tmp : wallBlocks) {
             if (isThereDownWall(tmp.getTopPosX(), tmp.getTopPosY(), tmp.getSize())) {
                 canMoveDown = false;
@@ -252,12 +260,6 @@ public class GameView extends View {
             if (isThereRightWall(tmp.getTopPosX(), tmp.getTopPosY(), tmp.getSize())) {
                 canMoveRight = false;
                 break;
-            }
-        }
-        for (LadderBlock tmp : ladderBlocks) {
-            if (isThereLadder(tmp.getTopPosX(), tmp.getTopPosY(), tmp.getSize())) {
-                canMoveHore = true;
-                isFalling = false;
             }
         }
         for (CoinBlock tmp : coinBlocks) {
@@ -320,7 +322,7 @@ public class GameView extends View {
             isDead = true;
         }
 
-        if(coinsCount == 14) {
+        if(coinsCount == 15) {
             if(!isDead) {
                 String value = Integer.toString(coinsCount);
                 Intent intent = new Intent(getContext(), GameOverActivity.class);
@@ -339,9 +341,6 @@ public class GameView extends View {
         character.moveCharacter(isTouched, direction, canMoveDown, canMoveLeft, canMoveRight, canMoveHore);
         enemy.moveEnemy("left");
         enemy2.moveEnemy("right");
-
-        //Draw map
-
 
     }
 
@@ -391,9 +390,9 @@ public class GameView extends View {
     //Detection methods
 
     public boolean isThereDownWall(int x, int y, int size){
-        if(character.getPosX() >= x && character.getPosX() <= x + size && character.getPosY() + character.getSize() >= y && character.getPosY() + character.getSize() <= y + 10
+        if(character.getPosX() >= x && character.getPosX() <= x + size && character.getPosY() + character.getSize() >= y - 2 && character.getPosY() + character.getSize() <= y + 10
                 ||
-           character.getPosX() + character.getSize() >= x && character.getPosX() + character.getSize() <= x + size && character.getPosY() + character.getSize() >= y && character.getPosY() + character.getSize() <= y + 10
+           character.getPosX() + character.getSize() >= x && character.getPosX() + character.getSize() <= x + size && character.getPosY() + character.getSize() >= y - 2 && character.getPosY() + character.getSize() <= y + 10
                 ){
             return true;
         }
