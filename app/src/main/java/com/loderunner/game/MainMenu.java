@@ -45,8 +45,14 @@ public class MainMenu extends Activity {
         @Override
         public void onSensorChanged(SensorEvent sensorEvent) {
             if(sensorEvent.values[0] < proximitySensor.getMaximumRange()) {
+                buttonplay.setVisibility(View.INVISIBLE);
+                buttonexit.setVisibility(View.INVISIBLE);
+                buttonscore.setVisibility(View.INVISIBLE);
                 prox.setText("Zakrytý");
             } else {
+                buttonplay.setVisibility(View.VISIBLE);
+                buttonexit.setVisibility(View.VISIBLE);
+                buttonscore.setVisibility(View.VISIBLE);
                 prox.setText("Odkrytý");
             }
         }
